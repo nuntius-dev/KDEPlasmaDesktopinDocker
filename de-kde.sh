@@ -3,7 +3,7 @@
 sudo apt update && sudo apt upgrade -y
 
 # Instalar XFCE y LightDM
-sudo apt install xfce4 xfce4-goodies zsh libreoffice zenity git curl wget gdebi lightdm chromium-browser firefox feathernotes geany synaptic audacious parole netsurf xarchiver -y
+sudo apt install xfce4 xfce4-goodies zsh libreoffice zenity git curl wget gdebi lightdm chromium-browser firefox feathernotes geany synaptic audacious parole xarchiver -y
 # Validar que una aplicación se proporciona como argumento
 if [ -z "$1" ]; then
   zenity --error --text="No se especificó ninguna aplicación para ejecutar." --title="Error"
