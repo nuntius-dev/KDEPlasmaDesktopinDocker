@@ -8,7 +8,7 @@ sudo apt update && sudo apt upgrade -y
 echo "Instalando aplicaciones necesarias..."
 sudo apt install -y zsh nano libreoffice libreoffice-l10n-es zenity \
   git curl wget gdebi chromium-browser feathernotes geany synaptic \
-  audacious parole xarchiver libgconf-2-4 libasound2 xfce4 xfce4-goodies xfce4-terminal
+  audacious parole xarchiver xfce4 xfce4-goodies xfce4-terminal
 
 # Agregar Brave Browser
 echo "Instalando Brave Browser..."
@@ -29,6 +29,7 @@ echo "startxfce4" | sudo tee /usr/local/bin/start-xfce
 chmod +x /usr/local/bin/start-xfce
 echo "pkill xfce4-session" | sudo tee /usr/local/bin/stop-xfce
 chmod +x /usr/local/bin/stop-xfce
+export GTK_A11Y=none
 # Instalar VSCode
 echo "Instalando Visual Studio Code..."
 curl -L https://aka.ms/linux-arm64-deb > code_arm64.deb
