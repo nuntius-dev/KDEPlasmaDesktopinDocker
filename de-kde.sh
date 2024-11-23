@@ -6,15 +6,19 @@ sudo apt update && sudo apt upgrade -y
 
 # Instalar XFCE y LightDM junto con herramientas necesarias
 echo "Instalando XFCE, LightDM y aplicaciones necesarias..."
-sudo apt install -y xfce4 xfce4-goodies lightdm zsh libreoffice libreoffice-l10n-es zenity git curl wget gdebi \
-  chromium-browser firefox-esr feathernotes geany synaptic audacious parole xarchiver
-
+sudo apt install -y xfce4 xfce4-goodies libnss3 libgconf-2-4 libnss3 libasound2 lightdm zsh nano libreoffice libreoffice-l10n-es zenity git curl wget gdebi \
+  chromium-browser feathernotes geany synaptic audacious parole xarchiver
+sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+sudo apt update
+sudo apt install brave-browser -y
+echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
 # Validar si se proporcionó una aplicación como argumento
 if [ -z "$1" ]; then
   zenity --error --text="No se especificó ninguna aplicación para ejecutar." --title="Error"
   exit 1
 fi
-
+curl -L https://aka.ms/linux-arm64-deb > code_arm64.deb
+sudo apt install ./code_arm64.deb -y
 # Configuración de Zsh
 echo "Configurando Zsh..."
 cd $HOME
@@ -41,7 +45,8 @@ tar -xzf postman-linux-x64.tar.gz
 if [ -d "/opt/Postman" ]; then
   sudo rm -rf /opt/Postman
 fi
-
+#Crear las carpetas necesarias
+mkdir -p ~/.local/share/applications
 # Mover Postman a /opt
 sudo mv Postman /opt/Postman
 
