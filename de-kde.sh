@@ -23,3 +23,4 @@ echo ""
 echo "XFCE instalado y configurado."
 echo "Reinicia el sistema para aplicar los cambios."
 echo ""
+startxfce4 &
