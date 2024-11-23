@@ -44,7 +44,7 @@ echo "Instalando Visual Studio Code..."
 curl -L https://aka.ms/linux-arm64-deb > code_arm64.deb
 sudo apt install ./code_arm64.deb -y
 rm -f code_arm64.deb
-startxfce4 &
+
 # Configuración de Zsh
 echo "Configurando Zsh..."
 cd $HOME
