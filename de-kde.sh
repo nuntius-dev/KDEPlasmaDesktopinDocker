@@ -6,7 +6,7 @@ sudo apt update && sudo apt upgrade -y
 
 # Instalar XFCE y LightDM junto con herramientas necesarias
 echo "Instalando XFCE, LightDM y aplicaciones necesarias..."
-sudo apt install -y xfce4 xfce4-goodies lightdm zsh libreoffice zenity git curl wget gdebi \
+sudo apt install -y xfce4 xfce4-goodies lightdm zsh libreoffice libreoffice-l10n-es zenity git curl wget gdebi \
   chromium-browser firefox-esr feathernotes geany synaptic audacious parole xarchiver
 
 # Validar si se proporcionó una aplicación como argumento
@@ -30,6 +30,40 @@ wget -q https://github.com/atamshkai/Termux-Desktop-2/raw/main/.zshrc -O ~/.zshr
 wget -q https://github.com/atamshkai/Termux-Desktop-2/raw/main/.zsh_history -O ~/.zsh_history
 
 chsh -s $(which zsh)
+# Descargar la última versión de Postman
+POSTMAN_URL="https://dl.pstmn.io/download/latest/linux"
+curl -L $POSTMAN_URL -o postman-linux-x64.tar.gz
+
+# Extraer los archivos
+tar -xzf postman-linux-x64.tar.gz
+
+# Verificar si ya existe una instalación previa en /opt y eliminarla
+if [ -d "/opt/Postman" ]; then
+  sudo rm -rf /opt/Postman
+fi
+
+# Mover Postman a /opt
+sudo mv Postman /opt/Postman
+
+# Crear un enlace simbólico para el ejecutable
+if [ ! -f "/usr/bin/postman" ]; then
+  sudo ln -s /opt/Postman/Postman /usr/bin/postman
+fi
+
+# Crear el archivo .desktop para Postman
+cat > ~/.local/share/applications/postman.desktop <<EOL
+[Desktop Entry]
+Encoding=UTF-8
+Name=Postman
+Exec=postman
+Icon=/opt/Postman/app/resources/app/assets/icon.png
+Terminal=false
+Type=Application
+Categories=Development;
+EOL
+
+# Limpiar archivos temporales
+rm -f postman-linux-x64.tar.gz
 
 # Ejecutar la aplicación con la variable DISPLAY configurada
 env DISPLAY=:0 "$@" &> /dev/null &
