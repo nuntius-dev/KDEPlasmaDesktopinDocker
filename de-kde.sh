@@ -8,7 +8,7 @@ sudo apt update && sudo apt upgrade -y
 echo "Instalando aplicaciones necesarias..."
 sudo apt install -y zsh nano libreoffice libreoffice-l10n-es zenity \
   git curl wget gdebi chromium-browser feathernotes geany synaptic \
-  audacious parole xarchiver libgconf-2-4 libasound2
+  audacious parole xarchiver libgconf-2-4 libasound2 xfce4 xfce4-goodies xfce4-terminal
 
 # Agregar Brave Browser
 echo "Instalando Brave Browser..."
@@ -21,7 +21,14 @@ if [ -z "$1" ]; then
   zenity --error --text="No se especificó ninguna aplicación para ejecutar." --title="Error"
   exit 1
 fi
-
+# Configuración de XFCE como entorno de escritorio
+sudo apt install -y dbus-x11
+echo "xfce4-session" > ~/.xsession
+# Crear scripts para iniciar y detener el entorno XFCE (opcional)
+echo "startxfce4" | sudo tee /usr/local/bin/start-xfce
+chmod +x /usr/local/bin/start-xfce
+echo "pkill xfce4-session" | sudo tee /usr/local/bin/stop-xfce
+chmod +x /usr/local/bin/stop-xfce
 # Instalar VSCode
 echo "Instalando Visual Studio Code..."
 curl -L https://aka.ms/linux-arm64-deb > code_arm64.deb
@@ -128,3 +135,5 @@ echo ""
 echo "Configuración completa."
 echo "Reinicia el sistema si es necesario."
 echo ""
+# Iniciar XFCE inmediatamente si está en un entorno compatible
+startxfce4 &
