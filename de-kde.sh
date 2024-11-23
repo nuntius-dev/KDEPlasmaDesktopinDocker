@@ -4,21 +4,30 @@
 echo "Actualizando el sistema..."
 sudo apt update && sudo apt upgrade -y
 
-# Instalar XFCE y LightDM junto con herramientas necesarias
+# Instalar XFCE, LightDM y herramientas necesarias
 echo "Instalando XFCE, LightDM y aplicaciones necesarias..."
-sudo apt install -y xfce4 xfce4-goodies libnss3 libgconf-2-4 libnss3 libasound2 lightdm zsh nano libreoffice libreoffice-l10n-es zenity git curl wget gdebi \
+sudo apt install -y xfce4 xfce4-goodies lightdm zsh nano \
+  libreoffice libreoffice-l10n-es zenity git curl wget gdebi \
   chromium-browser feathernotes geany synaptic audacious parole xarchiver
+
+# Agregar Brave Browser
+echo "Instalando Brave Browser..."
 sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
-sudo apt update
-sudo apt install brave-browser -y
-echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
-# Validar si se proporcionó una aplicación como argumento
+echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+sudo apt update && sudo apt install brave-browser -y
+
+# Verificar si se proporcionó una aplicación como argumento
 if [ -z "$1" ]; then
   zenity --error --text="No se especificó ninguna aplicación para ejecutar." --title="Error"
   exit 1
 fi
+
+# Instalar VSCode para ARM64
+echo "Instalando VSCode para ARM64..."
 curl -L https://aka.ms/linux-arm64-deb > code_arm64.deb
 sudo apt install ./code_arm64.deb -y
+rm -f code_arm64.deb
+
 # Configuración de Zsh
 echo "Configurando Zsh..."
 cd $HOME
@@ -34,28 +43,26 @@ wget -q https://github.com/atamshkai/Termux-Desktop-2/raw/main/.zshrc -O ~/.zshr
 wget -q https://github.com/atamshkai/Termux-Desktop-2/raw/main/.zsh_history -O ~/.zsh_history
 
 chsh -s $(which zsh)
-# Descargar la última versión de Postman
+
+# Instalar y configurar Postman
+echo "Instalando Postman..."
 POSTMAN_URL="https://dl.pstmn.io/download/latest/linux"
 curl -L $POSTMAN_URL -o postman-linux-x64.tar.gz
-
-# Extraer los archivos
 tar -xzf postman-linux-x64.tar.gz
 
-# Verificar si ya existe una instalación previa en /opt y eliminarla
+# Mover Postman a /opt
 if [ -d "/opt/Postman" ]; then
   sudo rm -rf /opt/Postman
 fi
-#Crear las carpetas necesarias
-mkdir -p ~/.local/share/applications
-# Mover Postman a /opt
 sudo mv Postman /opt/Postman
+rm -f postman-linux-x64.tar.gz
 
-# Crear un enlace simbólico para el ejecutable
+# Crear enlace simbólico para Postman
 if [ ! -f "/usr/bin/postman" ]; then
   sudo ln -s /opt/Postman/Postman /usr/bin/postman
 fi
 
-# Crear el archivo .desktop para Postman
+# Crear archivo .desktop para Postman
 cat > ~/.local/share/applications/postman.desktop <<EOL
 [Desktop Entry]
 Encoding=UTF-8
@@ -67,13 +74,8 @@ Type=Application
 Categories=Development;
 EOL
 
-# Limpiar archivos temporales
-rm -f postman-linux-x64.tar.gz
-
-# Ejecutar la aplicación con la variable DISPLAY configurada
-env DISPLAY=:0 "$@" &> /dev/null &
-
-# Crear un lanzador de escritorio para LibreOffice
+# Crear lanzador para LibreOffice
+echo "Creando lanzador para LibreOffice..."
 cat <<'EOF' > ~/Desktop/libreoffice.desktop
 [Desktop Entry]
 Version=1.0
@@ -88,26 +90,24 @@ StartupNotify=true
 EOF
 chmod +x ~/Desktop/libreoffice.desktop
 
-# Crear un script para instalar aplicaciones adicionales desde un repositorio personalizado
+# Crear script para instalar aplicaciones adicionales
+echo "Creando script para instalador de aplicaciones adicionales..."
 cat <<'EOF' > /usr/local/bin/app-installer
 #!/bin/bash
-
 REPO_URL="https://github.com/phoenixbyrd/App-Installer.git"
 INSTALLER_DIR="$HOME/.App-Installer"
 
-# Clonar o actualizar el repositorio
 if [ -d "$INSTALLER_DIR" ]; then
   cd "$INSTALLER_DIR" && git pull
 else
   git clone "$REPO_URL" "$INSTALLER_DIR"
 fi
 
-# Ejecutar el instalador
 bash "$INSTALLER_DIR/app-installer"
 EOF
 chmod +x /usr/local/bin/app-installer
 
-# Crear un lanzador de escritorio para el instalador de aplicaciones
+# Crear lanzador para el instalador de aplicaciones
 cat <<'EOF' > ~/Desktop/app-installer.desktop
 [Desktop Entry]
 Version=1.0
@@ -127,14 +127,13 @@ echo "Configurando LightDM como gestor de inicio..."
 sudo systemctl set-default graphical.target
 sudo dpkg-reconfigure lightdm
 
-# Agregar la ejecución de XFCE al inicio
+# Agregar inicio de XFCE
 echo "startxfce4 &" >> ~/.bashrc
 
 # Limpiar archivos innecesarios
-echo "Limpiando archivos y paquetes innecesarios..."
+echo "Limpiando archivos temporales..."
 sudo apt autoremove -y
 sudo apt clean
-rm -rf $HOME/zsh.tar.xz
 
 # Mensaje final
 clear
