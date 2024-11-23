@@ -24,6 +24,15 @@ fi
 # Configuración de XFCE como entorno de escritorio
 sudo apt install -y dbus-x11
 echo "xfce4-session" > ~/.xsession
+# Crear la carpeta Desktop sin importar el usuario
+mkdir -p "$HOME/Desktop"
+
+# Confirmar la creación
+if [ -d "$HOME/Desktop" ]; then
+  echo "Carpeta Desktop creada o ya existía en $HOME"
+else
+  echo "Hubo un problema al crear la carpeta Desktop"
+fi
 # Crear scripts para iniciar y detener el entorno XFCE (opcional)
 echo "startxfce4" | sudo tee /usr/local/bin/start-xfce
 chmod +x /usr/local/bin/start-xfce
