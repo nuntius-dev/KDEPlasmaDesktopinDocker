@@ -7,7 +7,7 @@ sudo apt update && sudo apt upgrade -y
 # Instalar herramientas necesarias
 echo "Instalando aplicaciones necesarias..."
 sudo apt install -y zsh nano libreoffice libreoffice-l10n-es zenity \
-  git curl wget gdebi chromium-browser feathernotes geany synaptic \
+  git curl wget gdebi feathernotes geany synaptic \
   audacious parole xarchiver xfce4 xfce4-goodies xfce4-terminal
 
 # Agregar Brave Browser
@@ -17,10 +17,10 @@ echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] http
 sudo apt update && sudo apt install brave-browser -y
 
 # Verificar si se proporcionó una aplicación como argumento
-if [ -z "$1" ]; then
-  zenity --error --text="No se especificó ninguna aplicación para ejecutar." --title="Error"
-  exit 1
-fi
+#if [ -z "$1" ]; then
+#  zenity --error --text="No se especificó ninguna aplicación para ejecutar." --title="Error"
+#  exit 1
+#fi
 # Configuración de XFCE como entorno de escritorio
 sudo apt install -y dbus-x11
 echo "xfce4-session" > ~/.xsession
