@@ -31,23 +31,6 @@ wget -q https://github.com/atamshkai/Termux-Desktop-2/raw/main/.zsh_history -O ~
 
 chsh -s $(which zsh)
 
-# Crear un script para alternar configuraciones (opcional)
-if [ -d "$HOME/.config" ]; then
-  mv ~/.config ~/.config.default
-fi
-
-echo "mv ~/.config ~/.config.windows
-mv ~/.config.default ~/.config
-mv ~/.zshrc ~/.zshrc.windows
-mv ~/.zshrc.default ~/.zshrc" | sudo tee /usr/local/bin/windows2default
-chmod +x /usr/local/bin/windows2default
-
-echo "mv ~/.config ~/.config.default
-mv ~/.config.windows ~/.config
-mv ~/.zshrc ~/.zshrc.default
-mv ~/.zshrc.windows ~/.zshrc" | sudo tee /usr/local/bin/default2windows
-chmod +x /usr/local/bin/default2windows
-
 # Ejecutar la aplicación con la variable DISPLAY configurada
 env DISPLAY=:0 "$@" &> /dev/null &
 
