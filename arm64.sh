@@ -60,7 +60,7 @@ wget -q https://github.com/atamshkai/Termux-Desktop-2/raw/main/.zsh_history -O ~
 
 chsh -s $(which zsh)
 
-# Instalar y configurar Postman
+# Instalar y configurar Postman.
 echo "Instalando Postman..."
 POSTMAN_URL="https://dl.pstmn.io/download/latest/linux"
 curl -L $POSTMAN_URL -o postman-linux-x64.tar.gz
