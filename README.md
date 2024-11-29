@@ -134,4 +134,6 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ---
 
-[Buy me a coffee](https://ko-fi.com/P5P013UUGZ)
+<a href="https://ko-fi.com/P5P013UUGZ">
+    <img src="https://github.com/nuntius-dev/badips/raw/main/kofi.png" alt="comprar cafe" width="150" />
+</a>
