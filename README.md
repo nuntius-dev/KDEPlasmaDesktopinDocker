@@ -9,6 +9,7 @@ This repository contains a Docker configuration to run **KDE Plasma Desktop** in
 - **KDE Plasma Desktop**: Full desktop environment for a modern graphical experience.
 - **TigerVNC Server**: For secure remote desktop access.
 - **noVNC**: HTML5-based VNC client to access the desktop from any web browser.
+- **Non-Root Execution**: Runs entirely under a standard user (`nuntius`) for improved security and desktop stability (DBus & Qt support).
 - **Persistent Volumes**: User configurations and desktop settings are preserved across sessions.
 - **Support for ARM Architectures**: Includes optional installation of Pi-Apps for ARM-based systems.
 
@@ -26,30 +27,32 @@ This repository contains a Docker configuration to run **KDE Plasma Desktop** in
 Clone this repository and build the Docker image:
 
 ```bash
-git clone https://github.com/nuntius-dev/KDEPlasmaDesktopinDocker.git
+git clone [https://github.com/nuntius-dev/KDEPlasmaDesktopinDocker.git](https://github.com/nuntius-dev/KDEPlasmaDesktopinDocker.git)
 cd KDEPlasmaDesktopinDocker
 docker build -t kde-plasma-docker .
-```
+````
 
 ### Run the Container
 
-To start the KDE Plasma Desktop:
+To start the KDE Plasma Desktop, run the following command. Note that we map the volumes to the `nuntius` user home directory:
 
 ```bash
 docker run -d \
   -p 5901:5901 \
   -p 8080:8080 \
-  -v $(pwd)/vnc:/root/.vnc \
-  -v $(pwd)/desktop:/root/Desktop \
+  -v $(pwd)/vnc:/home/nuntius/.vnc \
+  -v $(pwd)/desktop:/home/nuntius/Desktop \
   --name kde-plasma-container kde-plasma-docker
 ```
 
 ### Access the Desktop
 
-- **VNC Viewer**: Connect to `localhost:5901` using any VNC client. Use the password `docker` (modifiable in `Dockerfile`).
-- **Browser (noVNC)**: Open [http://localhost:8080/vnc.html](http://localhost:8080/vnc.html).
+  - **Browser (noVNC)**: Open [http://localhost:8080/vnc.html](https://www.google.com/search?q=http://localhost:8080/vnc.html). This is the easiest way to access the desktop.
+  - **VNC Viewer**: Connect to `localhost:5901` using any VNC client.
 
----
+*Note: The default password for both methods is `plasma123` (modifiable in the `Dockerfile`).*
+
+-----
 
 ## 🔧 Configuration
 
@@ -57,36 +60,33 @@ docker run -d \
 
 You can customize the setup using the following environment variables:
 
-| Variable      | Default  | Description                           |
-|---------------|----------|---------------------------------------|
-| `DISPLAY`     | `:1`     | Display number for VNC server.       |
-| `VNC_PORT`    | `5901`   | Port for the VNC server.             |
-| `NOVNC_PORT`  | `8080`   | Port for noVNC.                      |
-| `LANG`        | `en_US.UTF-8` | Language and locale settings.  |
+| Variable      | Default       | Description                               |
+|---------------|---------------|-------------------------------------------|
+| `DISPLAY`     | `:1`          | Display number for VNC server.            |
+| `VNC_PORT`    | `5901`        | Port for the VNC server.                  |
+| `NOVNC_PORT`  | `8080`        | Port for noVNC.                           |
+| `LANG`        | `en_US.UTF-8` | Language and locale settings.             |
+| `USER`        | `nuntius`     | Default non-root user running the session.|
 
 ### Persistent Volumes
 
-- `/root/.vnc`: Stores VNC passwords and configurations.
-- `/root/Desktop`: Preserves desktop files.
+  - `/home/nuntius/.vnc`: Stores VNC passwords and configurations.
+  - `/home/nuntius/Desktop`: Preserves desktop files.
 
-### Default User
-
-The default user created is `nuntius`. You can modify this in the `Dockerfile` if needed.
-
----
+-----
 
 ## 🛡 Security Notes
 
-- **VNC Password**: Default password is `docker`. It is strongly recommended to change it for production.
-- **Firewall**: Ensure proper firewall rules to limit access to `5901` and `8080`.
+  - **VNC Password**: Default password is `plasma123`. It is strongly recommended to change it in the `Dockerfile` for production environments.
+  - **Firewall**: Ensure proper firewall rules to limit external access to `5901` and `8080` if exposing to the internet.
 
----
+-----
 
 ## 🖥 For ARM Architectures
 
 This image detects ARM-based systems (e.g., Raspberry Pi) and installs **Pi-Apps**, a suite of apps optimized for ARM devices. This step is optional and only runs on supported architectures.
 
----
+-----
 
 ## 📝 Development and Debugging
 
@@ -106,33 +106,33 @@ You can attach to the container for debugging:
 docker exec -it kde-plasma-container bash
 ```
 
----
+-----
 
 ## 🌐 References
 
-- [KDE Plasma](https://kde.org/plasma-desktop/)
-- [TigerVNC](https://tigervnc.org/)
-- [noVNC](https://novnc.com/)
+  - [KDE Plasma](https://kde.org/plasma-desktop/)
+  - [TigerVNC](https://tigervnc.org/)
+  - [noVNC](https://novnc.com/)
 
----
+-----
 
 ## 👥 Contributing
 
-We welcome contributions! Please follow these steps:
+We welcome contributions\! Please follow these steps:
 
-1. Fork the repository.
-2. Create a feature branch: `git checkout -b feature-name`.
-3. Commit changes: `git commit -m "Add feature-name"`.
-4. Push to your branch: `git push origin feature-name`.
-5. Submit a pull request.
+1.  Fork the repository.
+2.  Create a feature branch: `git checkout -b feature-name`.
+3.  Commit changes: `git commit -m "Add feature-name"`.
+4.  Push to your branch: `git push origin feature-name`.
+5.  Submit a pull request.
 
----
+-----
 
 ## 📜 License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](https://www.google.com/search?q=LICENSE) file for details.
 
----
+-----
 
 <a href="https://ko-fi.com/P5P013UUGZ">
     <img src="https://github.com/nuntius-dev/badips/raw/main/kofi.png" alt="comprar cafe" width="150" />
