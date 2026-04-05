@@ -27,8 +27,9 @@ RUN apt-get update && apt-get upgrade -y && \
 RUN locale-gen en_US.UTF-8 && \
     update-locale LANG=en_US.UTF-8
 
-# crear el usuario 'nuntius' y agregarlo al grupo sudo
+# crear el usuario 'nuntius', asignarle contraseña y agregarlo al grupo sudo
 RUN useradd -m -s /bin/bash nuntius && \
+    echo "nuntius:plasma123" | chpasswd && \
     echo "nuntius ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # intentar crear el usuario 'docker'
@@ -39,6 +40,10 @@ RUN useradd -m -s /bin/bash docker || true && \
 # --- CAMBIO: Cambiar definitivamente al usuario 'nuntius' ---
 USER nuntius
 WORKDIR /home/nuntius
+
+# Desactivar el bloqueo de pantalla automático de KDE
+RUN mkdir -p /home/nuntius/.config && \
+    echo -e "[Daemon]\nAutolock=false\nLockOnResume=false" > /home/nuntius/.config/kscreenlockerrc
 
 RUN /bin/bash -c ' \
     arquitecturas=$(dpkg --print-architecture) && \
