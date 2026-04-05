@@ -8,9 +8,10 @@ ENV DEBIAN_FRONTEND=noninteractive \
     LC_ALL=en_US.UTF-8 \
     DISPLAY=:1 \
     VNC_PORT=5901 \
-    NOVNC_PORT=8080
+    NOVNC_PORT=8080 \
+    USER=nuntius
 
-# actualizar e instalar dependencias necesarias
+# actualizar e instalar dependencias necesarias (añadido dbus-x11)
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y \
     locales \
@@ -18,7 +19,7 @@ RUN apt-get update && apt-get upgrade -y && \
     tigervnc-standalone-server tigervnc-common \
     novnc websockify \
     xfonts-base x11-xserver-utils \
-    wget curl nano sudo && \
+    wget curl nano sudo dbus-x11 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -30,17 +31,14 @@ RUN locale-gen en_US.UTF-8 && \
 RUN useradd -m -s /bin/bash nuntius && \
     echo "nuntius ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-# intentar crear el usuario 'docker', pero primero verificar si ya existe
-RUN useradd -m -s /bin/bash docker || true
+# intentar crear el usuario 'docker'
+RUN useradd -m -s /bin/bash docker || true && \
+    echo "docker:docker" | chpasswd && \
+    usermod -aG sudo docker
 
-# establecer contraseña para el usuario 'docker'
-RUN echo "docker:docker" | chpasswd
-
-# agregar usuario 'docker' al grupo sudo
-RUN usermod -aG sudo docker
-
-# cambiar temporalmente al usuario 'nuntius' para ejecutar el script
+# --- CAMBIO: Cambiar definitivamente al usuario 'nuntius' ---
 USER nuntius
+WORKDIR /home/nuntius
 
 RUN /bin/bash -c ' \
     arquitecturas=$(dpkg --print-architecture) && \
@@ -52,39 +50,41 @@ RUN /bin/bash -c ' \
         echo "arquitectura no arm detectada. saltando instalación de pi-apps."; \
     fi'
 
-# cambiar de nuevo al usuario 'root' (opcional)
-USER root
+# crear directorios persistentes (ahora en el home del usuario)
+VOLUME /home/nuntius/.vnc
+VOLUME /home/nuntius/Desktop
 
-# crear directorios persistentes para vnc y desktop
-VOLUME /root/.vnc
-VOLUME /root/desktop
-
-# configurar tigervnc
-RUN mkdir -p /root/.vnc && \
-    echo "docker" | vncpasswd -f > /root/.vnc/passwd && \
-    chmod 600 /root/.vnc/passwd
+# configurar tigervnc de forma no interactiva
+RUN mkdir -p /home/nuntius/.vnc && \
+    echo "plasma123" | vncpasswd -f > /home/nuntius/.vnc/passwd && \
+    chmod 600 /home/nuntius/.vnc/passwd
 
 # crear el script de inicio
 RUN echo '#!/bin/bash\n\
 set -e\n\
 \n\
-# iniciar servidor vnc\n\
-vncserver -kill $DISPLAY || true\n\
-vncserver $DISPLAY -geometry 1280x720 -depth 24\n\
+# limpiar locks previos\n\
+rm -rf /tmp/.X1-lock /tmp/.X11-unix/X1\n\
+\n\
+# iniciar servidor vnc permitiendo conexiones locales\n\
+vncserver $DISPLAY -geometry 1280x720 -depth 24 -localhost no\n\
+\n\
+# exportar dbus para que KDE funcione correctamente\n\
+export $(dbus-launch)\n\
 \n\
 # iniciar plasma desktop\n\
 startplasma-x11 &\n\
 \n\
-# iniciar novnc\n\
-websockify --web=/usr/share/novnc/ --cert=/root/.vnc/self.pem $NOVNC_PORT localhost:$VNC_PORT &\n\
+# iniciar novnc (sin flag --cert para usar http simple)\n\
+websockify --web=/usr/share/novnc/ $NOVNC_PORT localhost:$VNC_PORT &\n\
 echo "novnc iniciado en http://localhost:$NOVNC_PORT/vnc.html"\n\
 \n\
 # mantener el contenedor activo\n\
-tail -f /dev/null' > /root/start.sh && \
-    chmod +x /root/start.sh
+tail -f /dev/null' > /home/nuntius/start.sh && \
+    chmod +x /home/nuntius/start.sh
 
-# puertos expuestos para vnc y novnc
+# puertos expuestos
 EXPOSE 5901 8080
 
 # comando para iniciar el contenedor
-CMD ["/bin/bash", "/root/start.sh"]
+CMD ["/bin/bash", "/home/nuntius/start.sh"]
