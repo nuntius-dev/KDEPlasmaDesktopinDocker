@@ -27,7 +27,7 @@ This repository contains a Docker configuration to run **KDE Plasma Desktop** in
 Clone this repository and build the Docker image:
 
 ```bash
-git clone [https://github.com/nuntius-dev/KDEPlasmaDesktopinDocker.git](https://github.com/nuntius-dev/KDEPlasmaDesktopinDocker.git)
+git clone https://github.com/nuntius-dev/KDEPlasmaDesktopinDocker.git
 cd KDEPlasmaDesktopinDocker
 docker build -t kde-plasma-docker .
 ````
